@@ -6,6 +6,7 @@
 /*  Valor do tempo da música */
 int tempo = 200;
 int tempo2 = 200;
+int tempo3 = 105;
 
 /*  Pino referente ao buzzer */
 int pinoBuzzer = 3;
@@ -15,115 +16,46 @@ int pinoBuzzer = 3;
 
 //       @ MELODIA 1 @
 const int melody[] PROGMEM = {
-  NOTE_E5,
-  8,
-  NOTE_D5,
-  8,
-  NOTE_FS4,
-  4,
-  NOTE_GS4,
-  4,
-  NOTE_CS5,
-  8,
-  NOTE_B4,
-  8,
-  NOTE_D4,
-  4,
-  NOTE_E4,
-  4,
-  NOTE_B4,
-  8,
-  NOTE_A4,
-  8,
-  NOTE_CS4,
-  4,
-  NOTE_E4,
-  4,
-  NOTE_A4,
-  2,
+  NOTE_E5, 8, NOTE_D5, 8, NOTE_FS4, 4, NOTE_GS4, 4, 
+  NOTE_CS5, 8, NOTE_B4, 8, NOTE_D4, 4, NOTE_E4, 4, 
+  NOTE_B4, 8, NOTE_A4, 8, NOTE_CS4, 4, NOTE_E4, 4,
+  NOTE_A4, 2, 
 };
 
 int notes = sizeof(melody) / sizeof(melody[0]) / 2;
-int wholenote = (60000 * 4) / tempo;
-int divider = 0, noteDuration = 0;
 
-//        @ MELODIA 2 @
+//          Melodia 2 -> mario game over
 
 const int melody2[] PROGMEM = {
-  NOTE_C5,
-  -4,
-  NOTE_G4,
-  -4,
-  NOTE_E4,
-  4,  // 45
-  NOTE_A4,
-  -8,
-  NOTE_B4,
-  -8,
-  NOTE_A4,
-  -8,
-  NOTE_GS4,
-  -8,
-  NOTE_AS4,
-  -8,
-  NOTE_GS4,
-  -8,
-  NOTE_G4,
-  8,
-  NOTE_D4,
-  8,
-  NOTE_E4,
-  -2,
+  NOTE_C5,-4, NOTE_G4,-4, NOTE_E4,4, //45
+  NOTE_A4,-8, NOTE_B4,-8, NOTE_A4,-8, NOTE_GS4,-8, NOTE_AS4,-8, NOTE_GS4,-8,
+  NOTE_G4,8, NOTE_D4,8, NOTE_E4,-2, 
 };
 
 int notes2 = sizeof(melody2) / sizeof(melody2[0]) / 2;
-int wholenote2 = (60000 * 4) / tempo2;
-int divider2 = 0, noteDuration2 = 0;
-// NAO EH O DESPACITO E O NOKIA................
-// .      .      .      .      .      .      .      .      .      .      .      .      .      .      .      .      .      .         -=- Declaração de variáveis -=-
 
-/*          @ MELODIA 3 @                                                                                                                                                                       */
-
+//          Melodia 3 -> pacman
 const int melody3[] PROGMEM = {
-
-  // Pacman
-  // Score available at https://musescore.com/user/85429/scores/107109
   NOTE_B4, 16, NOTE_B5, 16, NOTE_FS5, 16, NOTE_DS5, 16,  // 1
   NOTE_B5, 32, NOTE_FS5, -16, NOTE_DS5, 8, NOTE_C5, 16,
   NOTE_C6, 16, NOTE_G6, 16, NOTE_E6, 16, NOTE_C6, 32, NOTE_G6, -16, NOTE_E6, 8,
-
-  NOTE_B4, 16, NOTE_B5, 16, NOTE_FS5, 16, NOTE_DS5, 16, NOTE_B5, 32,  // 2
-  NOTE_FS5, -16, NOTE_DS5, 8, NOTE_DS5, 32, NOTE_E5, 32, NOTE_F5, 32,
-  NOTE_F5, 32, NOTE_FS5, 32, NOTE_G5, 32, NOTE_G5, 32, NOTE_GS5, 32, NOTE_A5, 16, NOTE_B5, 8
 };
 
 int notes3 = sizeof(melody) / sizeof(melody[0]) / 2;
-int wholenote3 = (60000 * 4) / tempo;
-int divider3 = 0, noteDuration3 = 0;
 
-/* Declaração de variáveis dos servos */
+
 Servo ServoBOCA;
 Servo ServoSE;
 Servo ServoSD;
 
-/* Declaração de variáveis dos leds + respectivos endereços no arduíno */
-// int verde1 = 40;
-// int vermelho1 = 42;
-// int verde2 = 41;
-// int vermelho2 = 43;
-// int azul1 = 44;
-// int azul2 = 45;
-
 const int rgb1[3] = { 42, 40, 44 };
 const int rgb2[3] = { 43, 41, 45 };
 
-/* Enderaçamento para as variáveis servos */
 #define potPin A10
-#define servoPinB 2 /* Antigamente na 1 */
+#define servoPinB 2 
 #define servoPinSE 4
 #define servoPinSD 6
 
-/* Enderaçamento/Mapeamento do teclado numérico */
 byte pinLinhas[] = { 30, 31, 32, 33 };
 byte pinColunas[] = { 34, 35, 36 };
 char teclas[4][3] = { { '1', '2', '3' },
@@ -135,15 +67,12 @@ char tecla_pressionada;
 int numbers[2];
 int rand_operator, final_value;
 
-/* Mapeamento do input no display */
 Keypad teclado = Keypad(makeKeymap(teclas), pinLinhas, pinColunas, 4, 3);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 int operation_math(int num1, int num2, int num_rand) {
   int value = 0;
 }
-
-// .      .      .      .      .      .      .      .      .      .      .      .      .      .      .      .      .      .         -=- Setup de inicializações -=-
 
 void setup() {
   Serial.begin(9600);
@@ -163,9 +92,10 @@ void setup() {
 
   lcd.init();
   lcd.backlight();
+
+  tocarMusica(melody3, notes3, tempo3);
 }
 
-// .      .      .      .      .      .      .      .      .      .      .      .      .      .      .      .      .      .            -=- Código Príncipal -=-
 
 void loop() {
   /* Mapeamento de configuração dos servos para as expressões */
@@ -173,29 +103,27 @@ void loop() {
   ServoSE.write(map(analogRead(potPin), 0, 1023, 10, 170));
   ServoSD.write(map(analogRead(potPin), 0, 1023, 10, 170));
 
-  /* Feedback interno */
   Serial.print("Angulo: ");
   Serial.println(map(analogRead(potPin), 0, 1023, 10, 170));
 
   delay(150);
 
-  /* Índice usado para a leitura do valor digitado pelo usuário */
   int index = 0;
 
-  /* Laço para limpar o array  dos valores digitados pelo usuário; */
-  for (int i = 0; i <= 49; i += 1) {
+  //Laço para limpar o array  dos valores digitados pelo usuário
+  for (int i = 0; i <= 49; i ++) {
     value[i] = {};
   }
 
-  /* Laço para escolher dois valores aleatórios para fazer a operação; */
-  for (int i = 0; i <= 1; i += 1) {
+  //Laço para escolher dois valores aleatórios para fazer a operação
+  for (int i = 0; i <= 1; i ++) {
     numbers[i] = random(2, 10);
   }
   int result_operation = numbers[0] * numbers[1];
 
   lcd.clear();
 
-  /* Início de display ao usuario, expressão neutra no O.S.M.A.R e texto inicial na tela */
+  //Início de display ao usuario, expressão neutra no O.S.M.A.R e texto inicial na tela
   lcd.print("Jogo da Tabuada");
   ServoBOCA.write(90);
   ServoSE.write(90);
@@ -231,25 +159,22 @@ void loop() {
         lcd.print(numbers[1]);
         lcd.print(" = ");
 
-        index = 0;  // Mudar para -1 futuramente
+        index = 0;  
       } else {
         value[index] = tecla_pressionada;
         index++;
         value[index] = '\0';
       }
-      lcd.print(tecla_pressionada);  // Talvez esse seja o bug
+      lcd.print(tecla_pressionada);  
     }
   }
   delay(100);
 
-  /*                            -=-                      -=-                   -=-                             */
 
   lcd.clear();
-
   final_value = atoi(value);
 
-  // .      .      .      .      .      .      .      .      .      .      .      .      .      .      .      .      .      .                 -=- Vitória -=-
-
+  //        Vitotória
   if (final_value == result_operation) {
     lcd.print("Parabens!!");
     lcd.setCursor(0, 1);
@@ -260,38 +185,21 @@ void loop() {
     ServoSD.write(60);
     ServoBOCA.write(0);
 
-    /* Alterando os LEDs respectivos (LOW desliga / HIGH liga) */
     digitalWrite(rgb1[2], LOW);
     digitalWrite(rgb2[2], LOW);
     digitalWrite(rgb1[1], HIGH);
     digitalWrite(rgb2[1], HIGH);
 
-    // .  .  .  .  . Reprodução da música 1 ("melody") .  .  .  .  .
-    Serial.println("TOCANDO MUSICA 1 - VITORIA");
+    //Serial.println("TOCANDO MUSICA 1 - VITORIA");
+    tocarMusica(melody, notes, tempo);
 
-    for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2) {
-      divider = pgm_read_word_near(melody + thisNote + 1);
-      if (divider > 0) {
-        noteDuration = (wholenote) / divider;
-      } else if (divider < 0) {
-        noteDuration = (wholenote) / abs(divider);
-        noteDuration *= 1.5;
-      }
-
-      tone(pinoBuzzer, pgm_read_word_near(melody + thisNote), noteDuration * 0.9);
-      delay(noteDuration);
-      noTone(pinoBuzzer);
-    }
-
-    // Desliga os leds, antes verdes
     digitalWrite(rgb1[1], LOW);
     digitalWrite(rgb2[1], LOW);
   }
 
 
 
-  // .      .      .      .      .      .      .      .      .      .      .      .      .      .      .      .      .      .                 -=- Derrota -=-
-
+  //         Derrota
   else {
     lcd.print("Errooooooouuu :(");
     lcd.setCursor(0, 1);
@@ -303,33 +211,39 @@ void loop() {
     ServoSD.write(110);
     ServoBOCA.write(180);
 
-    /* Alterando os LEDs respectivos (LOW desliga / HIGH liga) */
     digitalWrite(rgb1[2], LOW);
     digitalWrite(rgb2[2], LOW);
     digitalWrite(rgb1[0], HIGH);
     digitalWrite(rgb2[0], HIGH);
 
-    // .    .    .    .    .    .    .    .    .    .    .    .    .    .    .    Reprodução da música 2 ("melody2")
-    Serial.println("TOCANDO MUSICA 2 - DERROTA");
-  
-  for (int thisNote = 0; thisNote < notes2 * 2; thisNote = thisNote + 2){
-    divider2 = pgm_read_word_near(melody2 + thisNote + 1); // CORRIGIDO: usar divider2
-    if (divider2 > 0) {
-      noteDuration2 = (wholenote2) / divider2; // CORRIGIDO: usar divider2
-    } else if (divider2 < 0) {
-      noteDuration2 = (wholenote2) / abs(divider2); // CORRIGIDO: usar divider2
-      noteDuration2 *= 1.5; 
-    }
-
-    tone(pinoBuzzer, pgm_read_word_near(melody2 + thisNote), noteDuration2 * 0.9); // CORRIGIDO: usar noteDuration2
-    delay(noteDuration2); // CORRIGIDO: usar noteDuration2
-    noTone(pinoBuzzer);
-  }
+    //Serial.println("TOCANDO MUSICA 2 - DERROTA");
+    tocarMusica(melody2, notes2, tempo2);
 
     delay(600);
 
-    // Desliga os leds
     digitalWrite(rgb1[0], LOW);
     digitalWrite(rgb2[0], LOW);
+  }
+}
+
+//          Função responsável por tocar músicas
+void tocarMusica(const int melodia[], int numNotas, int tempo){
+  int wholenote = (60000 * 4) / tempo;
+
+  for(int thisNote = 0; thisNote < numNotas * 2; thisNote += 2){
+    int divisor = pgm_read_word_near(melodia + thisNote + 1);
+    int duracaoNota;
+
+    if(divisor > 0){
+      duracaoNota = wholenote / divisor;
+    } else if(divisor < 0){
+      duracaoNota = wholenote / abs(divisor);
+      duracaoNota *= 1.5;
+    }
+
+    tone(pinoBuzzer, pgm_read_word_near(melodia + thisNote), duracaoNota * 0.9);
+    delay(duracaoNota);
+    noTone(pinoBuzzer);
+
   }
 }
