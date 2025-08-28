@@ -4,25 +4,19 @@
 #include "pitches.h"
 
 /*  Valor do tempo da música */
-int tempo = 200;
-int tempo2 = 200;
-int tempo3 = 105;
-
-/*  Pino referente ao buzzer */
-int pinoBuzzer = 3;
+#define TEMPO1 200
+#define TEMPO2 200
+#define TEMPO3 105
 
 /* BIBLIOTECA DO CABA Q FEZ: https://github.com/robsoncouto/arduino-songs/tree/master */
-/* Programação das notas, tamanho, quantidade etc: */
-
-//       @ MELODIA 1 @
+//          Melodia 1 -> nokia
 const int melody[] PROGMEM = {
   NOTE_E5, 8, NOTE_D5, 8, NOTE_FS4, 4, NOTE_GS4, 4, 
   NOTE_CS5, 8, NOTE_B4, 8, NOTE_D4, 4, NOTE_E4, 4, 
   NOTE_B4, 8, NOTE_A4, 8, NOTE_CS4, 4, NOTE_E4, 4,
   NOTE_A4, 2, 
 };
-
-int notes = sizeof(melody) / sizeof(melody[0]) / 2;
+const int notes = sizeof(melody) / sizeof(melody[0]) / 2;
 
 //          Melodia 2 -> mario game over
 
@@ -31,8 +25,7 @@ const int melody2[] PROGMEM = {
   NOTE_A4,-8, NOTE_B4,-8, NOTE_A4,-8, NOTE_GS4,-8, NOTE_AS4,-8, NOTE_GS4,-8,
   NOTE_G4,8, NOTE_D4,8, NOTE_E4,-2, 
 };
-
-int notes2 = sizeof(melody2) / sizeof(melody2[0]) / 2;
+const int notes2 = sizeof(melody2) / sizeof(melody2[0]) / 2;
 
 //          Melodia 3 -> pacman
 const int melody3[] PROGMEM = {
@@ -40,9 +33,9 @@ const int melody3[] PROGMEM = {
   NOTE_B5, 32, NOTE_FS5, -16, NOTE_DS5, 8, NOTE_C5, 16,
   NOTE_C6, 16, NOTE_G6, 16, NOTE_E6, 16, NOTE_C6, 32, NOTE_G6, -16, NOTE_E6, 8,
 };
+const int notes3 = sizeof(melody3) / sizeof(melody3[0]) / 2;
 
-int notes3 = sizeof(melody) / sizeof(melody[0]) / 2;
-
+#define pinoBuzzer 3
 
 Servo ServoBOCA;
 Servo ServoSE;
@@ -51,17 +44,18 @@ Servo ServoSD;
 const int rgb1[3] = { 42, 40, 44 };
 const int rgb2[3] = { 43, 41, 45 };
 
+//qual a utilidade desse pot na A10?
 #define potPin A10
 #define servoPinB 2 
 #define servoPinSE 4
 #define servoPinSD 6
 
-byte pinLinhas[] = { 30, 31, 32, 33 };
-byte pinColunas[] = { 34, 35, 36 };
-char teclas[4][3] = { { '1', '2', '3' },
-                      { '4', '5', '6' },
-                      { '7', '8', '9' },
-                      { '*', '0', '#' } };
+const byte pinLinhas[] = { 30, 31, 32, 33 };
+const byte pinColunas[] = { 34, 35, 36 };
+const char teclas[4][3] = { { '1', '2', '3' },
+                            { '4', '5', '6' },
+                            { '7', '8', '9' },
+                            { '*', '0', '#' } };
 char value[50];
 char tecla_pressionada;
 int numbers[2];
@@ -69,10 +63,6 @@ int rand_operator, final_value;
 
 Keypad teclado = Keypad(makeKeymap(teclas), pinLinhas, pinColunas, 4, 3);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
-
-int operation_math(int num1, int num2, int num_rand) {
-  int value = 0;
-}
 
 void setup() {
   Serial.begin(9600);
@@ -92,8 +82,6 @@ void setup() {
 
   lcd.init();
   lcd.backlight();
-
-  tocarMusica(melody3, notes3, tempo3);
 }
 
 
@@ -132,14 +120,12 @@ void loop() {
   digitalWrite(rgb1[2], HIGH);  // Liga o led esquerdo em Azul
   digitalWrite(rgb2[2], HIGH);  // Liga o led direito em Azul
 
-  /* Posicionando os valores de saída no display */
   lcd.setCursor(0, 1);
   lcd.print(numbers[0]);
   lcd.print(" x ");
   lcd.print(numbers[1]);
   lcd.print(" = ");
 
-  /*                            ### TEM UM ERRO NO DISPLAY AQUI EM ALGUM LUGAR ###                             */
   while (true) {
     tecla_pressionada = teclado.getKey();
 
@@ -148,7 +134,7 @@ void loop() {
         break;
       } else if (tecla_pressionada == '*') {
         for (int i = 0; i <= 19; i += 1) {
-          value[i] = ' ';
+          value[i] = {};
         }
 
         lcd.clear();
@@ -164,8 +150,8 @@ void loop() {
         value[index] = tecla_pressionada;
         index++;
         value[index] = '\0';
+        lcd.print(tecla_pressionada);  
       }
-      lcd.print(tecla_pressionada);  
     }
   }
   delay(100);
@@ -191,7 +177,7 @@ void loop() {
     digitalWrite(rgb2[1], HIGH);
 
     //Serial.println("TOCANDO MUSICA 1 - VITORIA");
-    tocarMusica(melody, notes, tempo);
+    tocarMusica(melody, notes, TEMPO1);
 
     digitalWrite(rgb1[1], LOW);
     digitalWrite(rgb2[1], LOW);
@@ -217,7 +203,7 @@ void loop() {
     digitalWrite(rgb2[0], HIGH);
 
     //Serial.println("TOCANDO MUSICA 2 - DERROTA");
-    tocarMusica(melody2, notes2, tempo2);
+    tocarMusica(melody2, notes2, TEMPO2);
 
     delay(600);
 
