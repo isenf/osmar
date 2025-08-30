@@ -35,6 +35,19 @@ const int melody3[] PROGMEM = {
 };
 const int notes3 = sizeof(melody3) / sizeof(melody3[0]) / 2;
 
+//          Melodia 4 -> despacito
+const int melody4[] PROGMEM= {
+  NOTE_D5, 2, NOTE_CS5, 2, NOTE_B4, 4, NOTE_FS4, 4,
+  NOTE_FS4, 8, NOTE_FS4, 8, NOTE_FS4, 8, NOTE_FS4, 8, NOTE_B4, 8, NOTE_B4, 8, NOTE_B4, 8, NOTE_B4, 8, NOTE_B4, 8, NOTE_A4, 8, NOTE_B4, 4, NOTE_G4, 4,
+  NOTE_G4, 8, NOTE_G4, 8, NOTE_G4, 8, NOTE_G4, 8, NOTE_B4, 8, NOTE_B4, 8, NOTE_B4, 8, NOTE_B4, 8, NOTE_B4, 8, NOTE_CS5, 8, NOTE_D5, 4, NOTE_A4, 4,
+  NOTE_A4, 8, NOTE_A4, 8, NOTE_A4, 8, NOTE_A4, 8, NOTE_D4, 8, NOTE_D4, 8, NOTE_D4, 8, NOTE_D4, 8, NOTE_D4, 8, NOTE_E4, 8, NOTE_E4, 4, NOTE_CS4, 2,
+  0, 8,
+  NOTE_FS4, 8, NOTE_FS4, 8, NOTE_FS4, 8, NOTE_FS4, 8, NOTE_B4, 8, NOTE_B4, 8, NOTE_B4, 8, NOTE_B4, 8, NOTE_B4, 8, NOTE_A4, 8, NOTE_B4, 4, NOTE_G4, 4,
+  NOTE_G4, 8, NOTE_G4, 8, NOTE_G4, 8, NOTE_G4, 8, NOTE_B4, 8, NOTE_B4, 8, NOTE_B4, 8, NOTE_B4, 8, NOTE_B4, 8, NOTE_CS5, 8, NOTE_D5, 4, NOTE_A4, 4,
+  NOTE_A4, 8, NOTE_A4, 8, NOTE_A4, 8, NOTE_A4, 8, NOTE_D4, 8, NOTE_D4, 8, NOTE_D4, 8, NOTE_D4, 8, NOTE_D4, 8, NOTE_E4, 8, NOTE_E4, 4, NOTE_CS4, 2,
+};
+const int notes4 = sizeof(melody4) / sizeof(melody4[0]) / 2;
+
 #define pinoBuzzer 3
 
 Servo ServoBOCA;
