@@ -117,8 +117,7 @@ void loop() {
   ServoSE.write(90);
   ServoSD.write(90);
 
-  digitalWrite(rgb1[2], HIGH);  // Liga o led esquerdo em Azul
-  digitalWrite(rgb2[2], HIGH);  // Liga o led direito em Azul
+  estadoLeds(false, false, true);
 
   lcd.setCursor(0, 1);
   lcd.print(numbers[0]);
@@ -171,16 +170,12 @@ void loop() {
     ServoSD.write(60);
     ServoBOCA.write(0);
 
-    digitalWrite(rgb1[2], LOW);
-    digitalWrite(rgb2[2], LOW);
-    digitalWrite(rgb1[1], HIGH);
-    digitalWrite(rgb2[1], HIGH);
+    estadoLeds(false, true, false);
 
     //Serial.println("TOCANDO MUSICA 1 - VITORIA");
     tocarMusica(melody, notes, TEMPO1);
 
-    digitalWrite(rgb1[1], LOW);
-    digitalWrite(rgb2[1], LOW);
+    estadoLeds(false, false, false);
   }
 
 
@@ -197,18 +192,14 @@ void loop() {
     ServoSD.write(110);
     ServoBOCA.write(180);
 
-    digitalWrite(rgb1[2], LOW);
-    digitalWrite(rgb2[2], LOW);
-    digitalWrite(rgb1[0], HIGH);
-    digitalWrite(rgb2[0], HIGH);
+    estadoLeds(true, false, false);
 
     //Serial.println("TOCANDO MUSICA 2 - DERROTA");
     tocarMusica(melody2, notes2, TEMPO2);
 
     delay(600);
 
-    digitalWrite(rgb1[0], LOW);
-    digitalWrite(rgb2[0], LOW);
+    estadoLeds(false, false, false);
   }
 }
 
@@ -232,4 +223,15 @@ void tocarMusica(const int melodia[], int numNotas, int tempo){
     noTone(pinoBuzzer);
 
   }
+}
+
+// Controla o status dos leds (nao ta ruim, mas da pra melhorar em breve)
+void estadoLeds(bool statusRed, bool statusGreen, bool statusBlue){
+  digitalWrite(rgb1[0], statusRed);
+  digitalWrite(rgb1[1], statusGreen);
+  digitalWrite(rgb1[2], statusBlue);
+
+  digitalWrite(rgb2[0], statusRed);
+  digitalWrite(rgb2[1], statusGreen);
+  digitalWrite(rgb2[2], statusBlue);
 }
