@@ -64,6 +64,8 @@ int rand_operator, final_value;
 Keypad teclado = Keypad(makeKeymap(teclas), pinLinhas, pinColunas, 4, 3);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
+int pontuacao = 0;
+
 void setup() {
   Serial.begin(9600);
 
@@ -161,9 +163,11 @@ void loop() {
 
   //        Vitotória
   if (final_value == result_operation) {
+    pontuacao++;
     lcd.print("Parabens!!");
     lcd.setCursor(0, 1);
-    lcd.print("Acertou Mizeravi :)");
+    lcd.print("Acertos: ");
+    lcd.print(pontuacao);
 
     /* Alterando a expressão do rosto = Feliz */
     ServoSE.write(120);
@@ -182,6 +186,7 @@ void loop() {
 
   //         Derrota
   else {
+    pontuacao = 0;
     lcd.print("Errooooooouuu :(");
     lcd.setCursor(0, 1);
     lcd.print("Resposta: ");
