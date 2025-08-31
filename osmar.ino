@@ -6,7 +6,8 @@
 /*  Valor do tempo da música */
 #define TEMPO1 200
 #define TEMPO2 200
-#define TEMPO3 105
+#define TEMPO3 200
+#define TEMPO4 200
 
 /* BIBLIOTECA DO CABA Q FEZ: https://github.com/robsoncouto/arduino-songs/tree/master */
 //          Melodia 1 -> nokia
@@ -27,11 +28,24 @@ const int melody2[] PROGMEM = {
 };
 const int notes2 = sizeof(melody2) / sizeof(melody2[0]) / 2;
 
-//          Melodia 3 -> pacman
+//          Melodia 3 -> subway surfers
 const int melody3[] PROGMEM = {
-  NOTE_B4, 16, NOTE_B5, 16, NOTE_FS5, 16, NOTE_DS5, 16,  // 1
-  NOTE_B5, 32, NOTE_FS5, -16, NOTE_DS5, 8, NOTE_C5, 16,
-  NOTE_C6, 16, NOTE_G6, 16, NOTE_E6, 16, NOTE_C6, 32, NOTE_G6, -16, NOTE_E6, 8,
+  NOTE_C4,4, REST,8, NOTE_G4,4, REST,8, NOTE_AS4,4, NOTE_C5,8, NOTE_AS4,8, REST,16, NOTE_F4,8, NOTE_DS4,8, REST,16,
+  NOTE_C4,4, REST,8, NOTE_G4,4, REST,8, NOTE_AS4,4, NOTE_C5,8, NOTE_AS4,8, REST,16, NOTE_F4,8, NOTE_DS4,8, REST,16,
+  NOTE_C4,4, REST,8, NOTE_G4,4, REST,8, NOTE_AS4,4, NOTE_C5,8, NOTE_AS4,8, REST,16, NOTE_F4,8, NOTE_DS4,8, REST,16,
+
+  NOTE_C4,4, REST,8, NOTE_E4,4, REST,8, NOTE_G4,4, NOTE_A4,4, NOTE_AS4,4,
+  NOTE_C5,8, REST,16, NOTE_C5,8, REST,16, NOTE_AS4,8, REST,16, NOTE_A4,8, REST,16,
+  NOTE_AS4,8, REST,16, NOTE_AS4,8, NOTE_C5,8, REST,16, NOTE_AS4,8, NOTE_A4,8, REST,16,
+  REST,4,
+  NOTE_C5,8, REST,16, NOTE_AS4,8, REST,16, NOTE_A4,8, REST,16, NOTE_AS4,8, REST,4, NOTE_E5,8,
+  REST,4,
+
+  NOTE_C5,8, REST,16, NOTE_C5,8, REST,16, NOTE_AS4,8, REST,16, NOTE_A4,8, REST,16,
+  NOTE_AS4,8, REST,16, NOTE_AS4,8, NOTE_C5,8, REST,16, NOTE_AS4,8, NOTE_A4,8, REST,16,
+  REST,4,
+  NOTE_C5,8, REST,16, NOTE_AS4,8, REST,16, NOTE_A4,8, REST,16, NOTE_AS4,8, REST,4, NOTE_E4,8,
+  REST,1
 };
 const int notes3 = sizeof(melody3) / sizeof(melody3[0]) / 2;
 
@@ -42,9 +56,6 @@ const int melody4[] PROGMEM= {
   NOTE_G4, 8, NOTE_G4, 8, NOTE_G4, 8, NOTE_G4, 8, NOTE_B4, 8, NOTE_B4, 8, NOTE_B4, 8, NOTE_B4, 8, NOTE_B4, 8, NOTE_CS5, 8, NOTE_D5, 4, NOTE_A4, 4,
   NOTE_A4, 8, NOTE_A4, 8, NOTE_A4, 8, NOTE_A4, 8, NOTE_D4, 8, NOTE_D4, 8, NOTE_D4, 8, NOTE_D4, 8, NOTE_D4, 8, NOTE_E4, 8, NOTE_E4, 4, NOTE_CS4, 2,
   0, 8,
-  NOTE_FS4, 8, NOTE_FS4, 8, NOTE_FS4, 8, NOTE_FS4, 8, NOTE_B4, 8, NOTE_B4, 8, NOTE_B4, 8, NOTE_B4, 8, NOTE_B4, 8, NOTE_A4, 8, NOTE_B4, 4, NOTE_G4, 4,
-  NOTE_G4, 8, NOTE_G4, 8, NOTE_G4, 8, NOTE_G4, 8, NOTE_B4, 8, NOTE_B4, 8, NOTE_B4, 8, NOTE_B4, 8, NOTE_B4, 8, NOTE_CS5, 8, NOTE_D5, 4, NOTE_A4, 4,
-  NOTE_A4, 8, NOTE_A4, 8, NOTE_A4, 8, NOTE_A4, 8, NOTE_D4, 8, NOTE_D4, 8, NOTE_D4, 8, NOTE_D4, 8, NOTE_D4, 8, NOTE_E4, 8, NOTE_E4, 4, NOTE_CS4, 2,
 };
 const int notes4 = sizeof(melody4) / sizeof(melody4[0]) / 2;
 
@@ -79,9 +90,36 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 int pontuacao = 0;
 
-void setup() {
-  Serial.begin(9600);
+int operacao_atual = 0;
+const char* operacoes_simb[] = { " + ", " - ", " x ", " / " };
+int nivel_dificuldade = 1;
+int fase_atual = 1; // (1 a 5)
+#define NUM_OPERACOES 4
+#define MUD_FASE 5
 
+//          Cria struct para dificuldade das operações e define cada nível de dificuldade (pode ser mudado dps)
+struct DificuldadeOperacao{
+  int val_min;
+  int val_max;
+};
+
+DificuldadeOperacao dif_adi_sub[5] = {
+  {1, 20},
+  {10, 40},
+  {20, 60},
+  {30, 80},
+  {50, 100}
+};
+
+DificuldadeOperacao dif_mult_div[5] = {
+  {2, 5},
+  {2, 8},
+  {2, 11},
+  {2, 15},
+  {2, 20}
+};
+
+void setup() {
   ServoBOCA.attach(servoPinB);
   ServoSE.attach(servoPinSE);
   ServoSD.attach(servoPinSD);
@@ -95,8 +133,12 @@ void setup() {
 
   randomSeed(analogRead(A0));
 
+  Serial.begin(9600);
+
   lcd.init();
   lcd.backlight();
+
+  operacao_atual = random(0, NUM_OPERACOES);
 }
 
 
@@ -115,30 +157,57 @@ void loop() {
 
   //Laço para limpar o array  dos valores digitados pelo usuário
   for (int i = 0; i <= 49; i ++) {
-    value[i] = {};
+    value[i] = '\0';
   }
 
-  //Laço para escolher dois valores aleatórios para fazer a operação
-  for (int i = 0; i <= 1; i ++) {
-    numbers[i] = random(2, 10);
-  }
-  int result_operation = numbers[0] * numbers[1];
+  int result_operation = 0;
+  bool eh_op_inv = false; //é operação inversa
+  int temp_num1, temp_num2;
+
+  switch(operacao_atual){
+    case 0: //adicao
+      numbers[0] = gerarNumAletorio(dif_adi_sub, fase_atual);
+      numbers[1] = gerarNumAletorio(dif_adi_sub, fase_atual);
+
+      result_operation = numbers[0] + numbers[1];
+      break;
+    case 1: //subtração
+      temp_num1 = gerarNumAletorio(dif_adi_sub, fase_atual);
+      temp_num2 = gerarNumAletorio(dif_adi_sub, fase_atual);
+
+      result_operation = temp_num2;
+      numbers[0] = temp_num1 + temp_num2;
+      numbers[1] = temp_num1;
+
+      break;
+    
+    case 2:
+      numbers[0] = gerarNumAletorio(dif_mult_div, fase_atual);
+      numbers[1] = gerarNumAletorio(dif_mult_div, fase_atual);
+
+      result_operation = numbers[0] * numbers[1];
+      break;
+
+    case 3:
+      temp_num1 = gerarNumAletorio(dif_mult_div, fase_atual);
+      temp_num2 = gerarNumAletorio(dif_mult_div, fase_atual);
+
+      result_operation = temp_num2;
+      numbers[0] = temp_num1 * temp_num2;
+      numbers[1] = temp_num1;
+      break;
+
+  }  
 
   lcd.clear();
 
-  //Início de display ao usuario, expressão neutra no O.S.M.A.R e texto inicial na tela
-  lcd.print("Jogo da Tabuada");
+  //        Expressao neutra no osmar
   ServoBOCA.write(90);
   ServoSE.write(90);
   ServoSD.write(90);
 
   estadoLeds(false, false, true);
-
-  lcd.setCursor(0, 1);
-  lcd.print(numbers[0]);
-  lcd.print(" x ");
-  lcd.print(numbers[1]);
-  lcd.print(" = ");
+  imprimeOperacao(fase_atual, nivel_dificuldade, numbers, operacoes_simb[operacao_atual]);
 
   while (true) {
     tecla_pressionada = teclado.getKey();
@@ -152,12 +221,8 @@ void loop() {
         }
 
         lcd.clear();
-        lcd.print("Jogo da Tabuada");
-        lcd.setCursor(0, 1);
-        lcd.print(numbers[0]);
-        lcd.print(" x ");
-        lcd.print(numbers[1]);
-        lcd.print(" = ");
+
+        imprimeOperacao(fase_atual, nivel_dificuldade, numbers, operacoes_simb[operacao_atual]);
 
         index = 0;  
       } else {
@@ -177,21 +242,42 @@ void loop() {
   //        Vitotória
   if (final_value == result_operation) {
     pontuacao++;
-    lcd.print("Parabens!!");
-    lcd.setCursor(0, 1);
-    lcd.print("Acertos: ");
-    lcd.print(pontuacao);
+    nivel_dificuldade++;
 
-    /* Alterando a expressão do rosto = Feliz */
+    // Alterando a expressão do rosto = Feliz
     ServoSE.write(120);
     ServoSD.write(60);
     ServoBOCA.write(0);
 
     estadoLeds(false, true, false);
 
-    //Serial.println("TOCANDO MUSICA 1 - VITORIA");
-    tocarMusica(melody, notes, TEMPO1);
+    if(nivel_dificuldade == (MUD_FASE * 5) + MUD_FASE){
+      lcd.print("VENCEU O OSMAR");
+      lcd.setCursor(0, 1);
+      lcd.print("PARABENS!! :D");
 
+      tocarMusica(melody3, notes3, TEMPO3);
+      
+    }
+    else if(nivel_dificuldade % MUD_FASE == 0 && fase_atual < 5){ 
+      fase_atual++;
+
+      lcd.print("FASE ");
+      lcd.print(fase_atual);
+      lcd.print(" DESBLOQ.");
+      lcd.setCursor(0, 1);
+      lcd.print("Parabens :D");
+
+      tocarMusica(melody4, notes4, TEMPO1);
+    } else{
+
+      lcd.print("Acertou Mizeravi");
+      lcd.setCursor(0, 1);
+      lcd.print("Pontos: ");
+      lcd.print(pontuacao);
+    
+      tocarMusica(melody, notes, TEMPO1);
+    }
     estadoLeds(false, false, false);
   }
 
@@ -200,6 +286,9 @@ void loop() {
   //         Derrota
   else {
     pontuacao = 0;
+    nivel_dificuldade = 1;
+    fase_atual = 1;
+
     lcd.print("Errooooooouuu :(");
     lcd.setCursor(0, 1);
     lcd.print("Resposta: ");
@@ -212,7 +301,6 @@ void loop() {
 
     estadoLeds(true, false, false);
 
-    //Serial.println("TOCANDO MUSICA 2 - DERROTA");
     tocarMusica(melody2, notes2, TEMPO2);
 
     delay(600);
@@ -241,6 +329,9 @@ void tocarMusica(const int melodia[], int numNotas, int tempo){
     noTone(pinoBuzzer);
 
   }
+
+  operacao_atual = random(0, NUM_OPERACOES);
+
 }
 
 // Controla o status dos leds (nao ta ruim, mas da pra melhorar em breve)
@@ -252,4 +343,21 @@ void estadoLeds(bool statusRed, bool statusGreen, bool statusBlue){
   digitalWrite(rgb2[0], statusRed);
   digitalWrite(rgb2[1], statusGreen);
   digitalWrite(rgb2[2], statusBlue);
+}
+
+int gerarNumAletorio(const DificuldadeOperacao* dificuldade, int fase){
+  return random(dificuldade[fase - 1].val_min, dificuldade[fase - 1].val_max + 1);
+}
+
+void imprimeOperacao(int fase, int nlv_dif, int nums[], char* operacao){
+  lcd.print("Fase ");
+  lcd.print(fase_atual);
+  lcd.print(" - Nvl ");
+  lcd.print(nivel_dificuldade);
+
+  lcd.setCursor(0, 1);
+  lcd.print(nums[0]);
+  lcd.print(operacao);
+  lcd.print(nums[1]);
+  lcd.print(" = ");
 }
