@@ -4,10 +4,7 @@
 #include "pitches.h"
 
 /*  Valor do tempo da música */
-#define TEMPO1 200
-#define TEMPO2 200
-#define TEMPO3 200
-#define TEMPO4 200
+#define TEMPO 200
 
 /* BIBLIOTECA DO CABA Q FEZ: https://github.com/robsoncouto/arduino-songs/tree/master */
 //          Melodia 1 -> nokia
@@ -181,14 +178,14 @@ void loop() {
 
       break;
     
-    case 2:
+    case 2: //multiplicação
       numbers[0] = gerarNumAletorio(dif_mult_div, fase_atual);
       numbers[1] = gerarNumAletorio(dif_mult_div, fase_atual);
 
       result_operation = numbers[0] * numbers[1];
       break;
 
-    case 3:
+    case 3: //divisão
       temp_num1 = gerarNumAletorio(dif_mult_div, fase_atual);
       temp_num2 = gerarNumAletorio(dif_mult_div, fase_atual);
 
@@ -251,12 +248,12 @@ void loop() {
 
     estadoLeds(false, true, false);
 
-    if(nivel_dificuldade == (MUD_FASE * 5) + MUD_FASE){
+    if(nivel_dificuldade == (MUD_FASE * 5)){
       lcd.print("VENCEU O OSMAR");
       lcd.setCursor(0, 1);
       lcd.print("PARABENS!! :D");
 
-      tocarMusica(melody3, notes3, TEMPO3);
+      tocarMusica(melody3, notes3, TEMPO);
       
     }
     else if(nivel_dificuldade % MUD_FASE == 0 && fase_atual < 5){ 
@@ -268,7 +265,7 @@ void loop() {
       lcd.setCursor(0, 1);
       lcd.print("Parabens :D");
 
-      tocarMusica(melody4, notes4, TEMPO1);
+      tocarMusica(melody4, notes4, TEMPO);
     } else{
 
       lcd.print("Acertou Mizeravi");
@@ -276,7 +273,7 @@ void loop() {
       lcd.print("Pontos: ");
       lcd.print(pontuacao);
     
-      tocarMusica(melody, notes, TEMPO1);
+      tocarMusica(melody, notes, TEMPO);
     }
     estadoLeds(false, false, false);
   }
@@ -301,7 +298,7 @@ void loop() {
 
     estadoLeds(true, false, false);
 
-    tocarMusica(melody2, notes2, TEMPO2);
+    tocarMusica(melody2, notes2, TEMPO);
 
     delay(600);
 
